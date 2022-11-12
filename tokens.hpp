@@ -33,11 +33,10 @@ enum tokentype {
     ID = 27,
     NUM = 28,
     STRING = 29,
-    AUTO = 30,
-    WHITESPACE = 31,
-    UNCLOSED_STRING = 32,
-    WRONG_CHAR = 33,
-    ZERO_FIRST = 34
+    WHITESPACE = 30,
+    UNCLOSED_STRING = 31,
+    WRONG_CHAR = 32,
+    ZERO_FIRST = 33
 };
 
 static const char* tokenNames[] = {
@@ -71,7 +70,6 @@ static const char* tokenNames[] = {
     "ID",
     "NUM",
     "STRING",
-    "AUTO",
     "WHITESPACE",
     "UNCLOSED_STRING",
     "WRONG_CHAR",

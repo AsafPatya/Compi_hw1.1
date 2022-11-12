@@ -45,6 +45,8 @@ void handleInvalidToken(const std::string& errorMessage, const bool printLexeme 
     exit(0);
 }
 
+
+
 void printToken(const int token, const std::string& lexeme = yytext)
 {
     std::cout << yylineno << " " << tokenNames[token] << " " << lexeme << std::endl;
@@ -77,11 +79,13 @@ char handleEscapeSequence(int& escapeSequenceIndex)
                 }
             }
 
-            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, "x" + sequence);  // the chars are not hex so print the sequence  // TODO- check the printable error
+//            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, "x" + sequence);  // the chars are not hex so print the sequence  // TODO- check the printable error
+            handleInvalidEscapeSequenceError("x" + sequence);
             return SKIP_CHAR;
         }
         default:  // invalid escape sequence
-            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, std::string(yytext + escapeSequenceIndex, 1));
+//            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, std::string(yytext + escapeSequenceIndex, 1));
+            handleInvalidEscapeSequenceError(std::string(yytext + escapeSequenceIndex, 1));
             return SKIP_CHAR;
     }
 }
@@ -112,8 +116,45 @@ void printStringToken()
         }
         stringIndex++;
     }
-    handleInvalidToken(UNCLOSED_STRING_ERROR, false);
+//    handleInvalidToken(UNCLOSED_STRING_ERROR, false);
+    handleUnclosedString();
+
 }
+
+/// handles function - start
+
+void handleWrongChar()
+{
+    const char* error_message = "ERROR";
+    const char* lexeme = yytext;
+    cout << error_message << " " << yytext <<  endl;
+    exit(0);
+}
+
+void handleStartWithZero()
+{
+    const char* error_message = "ERROR";
+    const char* lexeme = "0";
+    cout << error_message << " " << yytext <<  endl;
+    exit(0);
+}
+
+void handleUnclosedString()
+{
+    const char* error_message = "Error unclosed string";
+    cout << error_message <<  endl;
+    exit(0);
+}
+
+void handleInvalidEscapeSequenceError(const std::string& lexeme)
+{
+    // for handleEscapeSequence function
+    const char* error_message = "Error undefined escape sequence";
+    cout << error_message << " " << lexeme <<  endl;
+    exit(0);
+}
+
+/// handles function - end
 
 int main()
 {
@@ -123,14 +164,17 @@ int main()
         switch (token)
         {
             case WRONG_CHAR:
-                handleInvalidToken(ERROR_TITLE);
+                handleWrongChar(); // changed V
                 break;
-            case ZERO_FIRST:  // https://piazza.com/class/l0tou1nunya1jn?cid=20
-                handleInvalidToken(ERROR_TITLE, true, "0");
+
+            case ZERO_FIRST:
+                handleStartWithZero();  // changed V
                 break;
-            case UNCLOSED_STRING:
-                handleInvalidToken(UNCLOSED_STRING_ERROR, false);
+
+            case UNCLOSED_STRING:  // changed V
+                handleUnclosedString();
                 break;
+
             case WHITESPACE:
                 break;
             case STRING:
