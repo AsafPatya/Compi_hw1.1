@@ -2,7 +2,10 @@
 #include <iostream>
 #include "tokens.hpp"
 
+#define ERROR_TITLE "Error"
 #define COMMENT_LEXEME "//"
+#define UNCLOSED_STRING_ERROR "Error unclosed string"
+#define INVALID_ESCAPE_SEQUENCE_ERROR "Error undefined escape sequence"
 
 const char SKIP_CHAR = '\0';
 const char MIN_CHAR_BOUND = '\x00';  // TODO- check the range
@@ -32,43 +35,15 @@ std::string getEscapeSequence(const int escapeSequenceIndex)
     return sequence;
 }
 
-/// handles function - start
-
-void handleWrongChar()
+void handleInvalidToken(const std::string& errorMessage, const bool printLexeme = true, const std::string& lexeme = yytext)
 {
-    const char* error_message = "ERROR";
-    const char* lexeme = yytext;
-    cout << error_message << " " << yytext <<  endl;
+    std::cout << errorMessage;
+    if (printLexeme) {
+        std::cout << " " << lexeme;
+    }
+    std::cout << std::endl;
     exit(0);
 }
-
-void handleStartWithZero()
-{
-    const char* error_message = "ERROR";
-    const char* lexeme = "0";
-    cout << error_message << " " << yytext <<  endl;
-    exit(0);
-}
-
-void handleUnclosedString()
-{
-    const char* error_message = "Error unclosed string";
-    cout << error_message <<  endl;
-    exit(0);
-}
-
-void handleInvalidEscapeSequenceError(const std::string& lexeme)
-{
-    // for handleEscapeSequence function
-    const char* error_message = "Error undefined escape sequence";
-    cout << error_message << " " << lexeme <<  endl;
-    exit(0);
-}
-
-/// handles function - end
-
-
-
 
 void printToken(const int token, const std::string& lexeme = yytext)
 {
@@ -101,11 +76,12 @@ char handleEscapeSequence(int& escapeSequenceIndex)
                     return newChar;
                 }
             }
-            handleInvalidEscapeSequenceError("x" + sequence);
+
+            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, "x" + sequence);  // the chars are not hex so print the sequence  // TODO- check the printable error
             return SKIP_CHAR;
         }
         default:  // invalid escape sequence
-            handleInvalidEscapeSequenceError(std::string(yytext + escapeSequenceIndex, 1));
+            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, std::string(yytext + escapeSequenceIndex, 1));
             return SKIP_CHAR;
     }
 }
@@ -136,31 +112,25 @@ void printStringToken()
         }
         stringIndex++;
     }
-    handleUnclosedString();
-
+    handleInvalidToken(UNCLOSED_STRING_ERROR, false);
 }
-
-
 
 int main()
 {
-	int token;
-	while ((token = yylex()))
+    int token;
+    while ((token = yylex()))
     {
         switch (token)
         {
             case WRONG_CHAR:
-                handleWrongChar(); // changed V
+                handleInvalidToken(ERROR_TITLE);
                 break;
-
-            case ZERO_FIRST:
-                handleStartWithZero();  // changed V
+            case ZERO_FIRST:  // https://piazza.com/class/l0tou1nunya1jn?cid=20
+                handleInvalidToken(ERROR_TITLE, true, "0");
                 break;
-
-            case UNCLOSED_STRING:  // changed V
-                handleUnclosedString();
+            case UNCLOSED_STRING:
+                handleInvalidToken(UNCLOSED_STRING_ERROR, false);
                 break;
-
             case WHITESPACE:
                 break;
             case STRING:
@@ -173,6 +143,6 @@ int main()
                 printToken(token);
                 break;
         }
-	}
-	return 0;
+    }
+    return 0;
 }
