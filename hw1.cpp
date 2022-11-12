@@ -2,7 +2,6 @@
 #include <iostream>
 #include "tokens.hpp"
 
-#define ERROR_TITLE "Error"
 #define COMMENT_LEXEME "//"
 #define UNCLOSED_STRING_ERROR "Error unclosed string"
 #define INVALID_ESCAPE_SEQUENCE_ERROR "Error undefined escape sequence"
@@ -35,15 +34,6 @@ std::string getEscapeSequence(const int escapeSequenceIndex)
     return sequence;
 }
 
-void handleInvalidToken(const std::string& errorMessage, const bool printLexeme = true, const std::string& lexeme = yytext)
-{
-    std::cout << errorMessage;
-    if (printLexeme) {
-        std::cout << " " << lexeme;
-    }
-    std::cout << std::endl;
-    exit(0);
-}
 
 
 
@@ -78,13 +68,10 @@ char handleEscapeSequence(int& escapeSequenceIndex)
                     return newChar;
                 }
             }
-
-//            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, "x" + sequence);  // the chars are not hex so print the sequence  // TODO- check the printable error
             handleInvalidEscapeSequenceError("x" + sequence);
             return SKIP_CHAR;
         }
         default:  // invalid escape sequence
-//            handleInvalidToken(INVALID_ESCAPE_SEQUENCE_ERROR, true, std::string(yytext + escapeSequenceIndex, 1));
             handleInvalidEscapeSequenceError(std::string(yytext + escapeSequenceIndex, 1));
             return SKIP_CHAR;
     }
@@ -116,7 +103,6 @@ void printStringToken()
         }
         stringIndex++;
     }
-//    handleInvalidToken(UNCLOSED_STRING_ERROR, false);
     handleUnclosedString();
 
 }
