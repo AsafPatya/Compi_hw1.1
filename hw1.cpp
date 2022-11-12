@@ -3,8 +3,6 @@
 #include "tokens.hpp"
 
 #define COMMENT_LEXEME "//"
-#define UNCLOSED_STRING_ERROR "Error unclosed string"
-#define INVALID_ESCAPE_SEQUENCE_ERROR "Error undefined escape sequence"
 
 const char SKIP_CHAR = '\0';
 const char MIN_CHAR_BOUND = '\x00';  // TODO- check the range
@@ -33,6 +31,41 @@ std::string getEscapeSequence(const int escapeSequenceIndex)
 
     return sequence;
 }
+
+/// handles function - start
+
+void handleWrongChar()
+{
+    const char* error_message = "ERROR";
+    const char* lexeme = yytext;
+    cout << error_message << " " << yytext <<  endl;
+    exit(0);
+}
+
+void handleStartWithZero()
+{
+    const char* error_message = "ERROR";
+    const char* lexeme = "0";
+    cout << error_message << " " << yytext <<  endl;
+    exit(0);
+}
+
+void handleUnclosedString()
+{
+    const char* error_message = "Error unclosed string";
+    cout << error_message <<  endl;
+    exit(0);
+}
+
+void handleInvalidEscapeSequenceError(const std::string& lexeme)
+{
+    // for handleEscapeSequence function
+    const char* error_message = "Error undefined escape sequence";
+    cout << error_message << " " << lexeme <<  endl;
+    exit(0);
+}
+
+/// handles function - end
 
 
 
@@ -107,40 +140,7 @@ void printStringToken()
 
 }
 
-/// handles function - start
 
-void handleWrongChar()
-{
-    const char* error_message = "ERROR";
-    const char* lexeme = yytext;
-    cout << error_message << " " << yytext <<  endl;
-    exit(0);
-}
-
-void handleStartWithZero()
-{
-    const char* error_message = "ERROR";
-    const char* lexeme = "0";
-    cout << error_message << " " << yytext <<  endl;
-    exit(0);
-}
-
-void handleUnclosedString()
-{
-    const char* error_message = "Error unclosed string";
-    cout << error_message <<  endl;
-    exit(0);
-}
-
-void handleInvalidEscapeSequenceError(const std::string& lexeme)
-{
-    // for handleEscapeSequence function
-    const char* error_message = "Error undefined escape sequence";
-    cout << error_message << " " << lexeme <<  endl;
-    exit(0);
-}
-
-/// handles function - end
 
 int main()
 {
